@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:animations/animations.dart';
-import 'package:note_app/page/add_notes_page.dart';
+import 'package:note_app/page/manage_note_page.dart';
 import 'package:note_app/constant.dart';
 import 'package:note_app/database/database.dart';
 import 'package:note_app/model/note.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:note_app/widget/app_bar_title.dart';
 import 'package:note_app/widget/list_notes.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -19,8 +20,7 @@ class _MyHomePageState extends State<MyHomePage> {
   //Variable init to store data from database, for displaying purpose(search function)
   List<Note> _notesForDisplay = [];
 
-  //Main font initialization(delete soon)
-  String mainFont = 'Poppins';
+  String inputType = "Add";
 
   //Init and store data from database to variables
   @override
@@ -56,19 +56,9 @@ class _MyHomePageState extends State<MyHomePage> {
         //App Bar title
         title: Padding(
           padding: EdgeInsets.only(left: 2.0),
-          child: RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: 'My',
-                  style: title1,
-                ),
-                TextSpan(
-                  text: 'Notes',
-                  style: title2,
-                ),
-              ],
-            ),
+          child: AppBarTitle(
+            title: 'My',
+            subtitle: 'Notes',
           ),
         ),
 
@@ -97,7 +87,9 @@ class _MyHomePageState extends State<MyHomePage> {
             onPressed: callback,
           );
         },
-        openBuilder: (context, _) => AddNotesPage(),
+        openBuilder: (context, _) => ManageNotePage(
+          inputType: "Add",
+        ),
       ),
 
       //App Body, contains search bar and notes

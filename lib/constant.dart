@@ -6,6 +6,12 @@ var primaryColor = Color(0xFF393E46);
 var white = Color(0xFFEEEEEE);
 var yellow = Color(0xFFFFD369);
 
+var hintTextCustom = GoogleFonts.poppins(
+  textStyle: TextStyle(
+    color: Colors.grey,
+  ),
+);
+
 var title1 = GoogleFonts.poppins(
   textStyle: TextStyle(
     fontWeight: FontWeight.bold,
@@ -13,6 +19,7 @@ var title1 = GoogleFonts.poppins(
     fontSize: 20,
   ),
 );
+
 var title2 = GoogleFonts.poppins(
   textStyle: TextStyle(
     fontWeight: FontWeight.bold,

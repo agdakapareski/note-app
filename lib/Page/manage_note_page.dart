@@ -3,62 +3,85 @@ import 'package:note_app/database/database.dart';
 import 'package:note_app/model/note.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:note_app/constant.dart';
+import 'package:note_app/widget/app_bar_title.dart';
 
-class AddNotesPage extends StatefulWidget {
-  AddNotesPage({Key key}) : super(key: key);
+class ManageNotePage extends StatefulWidget {
+  ManageNotePage({
+    Key key,
+    this.id,
+    this.title,
+    this.description,
+    this.inputType,
+  }) : super(key: key);
+
+  final int id;
+  final String title;
+  final String description;
+  final String inputType;
 
   @override
-  _AddNotesPageState createState() => _AddNotesPageState();
+  _ManageNotePageState createState() => _ManageNotePageState();
 }
 
-class _AddNotesPageState extends State<AddNotesPage> {
-  String mainFont = 'Poppins';
+class _ManageNotePageState extends State<ManageNotePage> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+  int id;
   String title;
   String description;
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      if (widget.inputType == "Edit") {
+        id = widget.id;
+        titleController.text = widget.title;
+        descriptionController.text = widget.description;
+      }
+    });
+  }
 
   clearText() {
     titleController.text = '';
     descriptionController.text = '';
   }
 
+  toHomePage() {
+    Navigator.of(context).pushNamedAndRemoveUntil('homepage', (route) => false);
+  }
+
   submitNotes() {
     title = titleController.text;
     description = descriptionController.text;
-    Note note = Note(null, title, description);
+    if (widget.inputType == "Add") {
+      Note note = Note(null, title, description);
 
-    clearText();
-    if (description == '' && title == '') {
-      Navigator.of(context)
-          .pushNamedAndRemoveUntil('homepage', (route) => false);
-    } else {
-      Db().save(note);
-      Navigator.of(context)
-          .pushNamedAndRemoveUntil('homepage', (route) => false);
+      clearText();
+      if (description == '' && title == '') {
+        toHomePage();
+      } else {
+        Db().save(note);
+        toHomePage();
+      }
+    } else if (widget.inputType == "Edit") {
+      Note note = Note(id, title, description);
+      Db().update(note);
+      clearText();
+      toHomePage();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: primaryColor,
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         centerTitle: true,
         elevation: 0,
-        title: RichText(
-          text: TextSpan(
-            children: [
-              TextSpan(
-                text: 'Add',
-                style: title1,
-              ),
-              TextSpan(
-                text: 'Note',
-                style: title2,
-              ),
-            ],
-          ),
+        title: AppBarTitle(
+          title: widget.inputType,
+          subtitle: 'Note',
         ),
         backgroundColor: backgroundColor,
         leading: IconButton(
@@ -82,9 +105,13 @@ class _AddNotesPageState extends State<AddNotesPage> {
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(10.0),
+                        topRight: Radius.circular(10.0),
+                      ),
                       color: yellow,
                     ),
+                    alignment: Alignment.centerLeft,
                     height: 50,
                     padding: EdgeInsets.fromLTRB(12, 10, 12, 0),
                     child: Row(
@@ -95,8 +122,7 @@ class _AddNotesPageState extends State<AddNotesPage> {
                             keyboardType: TextInputType.text,
                             maxLines: 10,
                             controller: titleController,
-                            style: GoogleFonts.getFont(
-                              mainFont,
+                            style: GoogleFonts.poppins(
                               textStyle: TextStyle(
                                 color: backgroundColor,
                               ),
@@ -104,12 +130,7 @@ class _AddNotesPageState extends State<AddNotesPage> {
                             decoration: InputDecoration(
                               hintText: 'Title...',
                               border: InputBorder.none,
-                              hintStyle: GoogleFonts.getFont(
-                                mainFont,
-                                textStyle: TextStyle(
-                                  color: Colors.grey,
-                                ),
-                              ),
+                              hintStyle: hintTextCustom,
                               contentPadding: EdgeInsets.all(0),
                             ),
                           ),
@@ -127,27 +148,31 @@ class _AddNotesPageState extends State<AddNotesPage> {
                               });
                             },
                           ),
-                        )
+                        ),
+                        widget.inputType == "Edit"
+                            ? iconController()
+                            : SizedBox()
                       ],
                     ),
                   ),
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(10.0),
+                          bottomRight: Radius.circular(10.0),
+                        ),
                         color: white,
                       ),
                       alignment: Alignment.topLeft,
                       height: 250,
-                      margin: EdgeInsets.fromLTRB(0, 12, 0, 0),
                       padding: EdgeInsets.fromLTRB(12, 12, 12, 0),
                       child: TextField(
                         cursorColor: yellow,
                         controller: descriptionController,
                         keyboardType: TextInputType.multiline,
-                        maxLines: 10,
-                        style: GoogleFonts.getFont(
-                          mainFont,
+                        maxLines: 23,
+                        style: GoogleFonts.poppins(
                           textStyle: TextStyle(
                             color: backgroundColor,
                           ),
@@ -155,12 +180,7 @@ class _AddNotesPageState extends State<AddNotesPage> {
                         decoration: InputDecoration(
                           hintText: 'Write something...',
                           border: InputBorder.none,
-                          hintStyle: GoogleFonts.getFont(
-                            mainFont,
-                            textStyle: TextStyle(
-                              color: Colors.grey,
-                            ),
-                          ),
+                          hintStyle: hintTextCustom,
                           contentPadding: EdgeInsets.all(0),
                         ),
                       ),
@@ -172,6 +192,31 @@ class _AddNotesPageState extends State<AddNotesPage> {
           ),
         ],
       ),
+    );
+  }
+
+  iconController() {
+    return Row(
+      children: [
+        SizedBox(
+          width: 20,
+        ),
+        Padding(
+          padding: EdgeInsets.only(bottom: 10),
+          child: GestureDetector(
+            child: Icon(
+              Icons.delete,
+              color: backgroundColor,
+            ),
+            onTap: () {
+              setState(() {
+                Db().delete(id);
+                toHomePage();
+              });
+            },
+          ),
+        ),
+      ],
     );
   }
 }

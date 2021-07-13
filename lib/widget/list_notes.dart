@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:note_app/constant.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:animations/animations.dart';
-import 'package:note_app/page/edit_note_page.dart';
+import 'package:note_app/page/manage_note_page.dart';
 import 'package:note_app/model/note.dart';
 
 class ListNotes extends StatefulWidget {
@@ -53,7 +53,7 @@ class _ListNotesState extends State<ListNotes> {
             crossAxisSpacing: 12,
           ),
           itemCount: widget.notesForDisplay.length,
-          itemBuilder: (context, i) {
+          itemBuilder: (context, index) {
             return OpenContainer(
               closedShape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(
@@ -80,7 +80,7 @@ class _ListNotesState extends State<ListNotes> {
                             children: [
                               Expanded(
                                 child: Text(
-                                  widget.notesForDisplay[i].title,
+                                  widget.notesForDisplay[index].title,
                                   style: GoogleFonts.poppins(
                                     color: primaryColor,
                                     fontSize: 13,
@@ -94,13 +94,13 @@ class _ListNotesState extends State<ListNotes> {
                         Container(
                           padding: EdgeInsets.all(10),
                           child: Text(
-                            widget.notesForDisplay[i].description,
+                            widget.notesForDisplay[index].description,
                             style: GoogleFonts.poppins(
                               color: backgroundColor,
                               fontSize: 13,
                             ),
                             overflow: TextOverflow.ellipsis,
-                            maxLines: 5,
+                            maxLines: 6,
                           ),
                         )
                       ],
@@ -108,10 +108,11 @@ class _ListNotesState extends State<ListNotes> {
                   ),
                 );
               },
-              openBuilder: (context, _) => EditNotePage(
-                id: widget.notesForDisplay[i].id,
-                title: widget.notesForDisplay[i].title,
-                description: widget.notesForDisplay[i].description,
+              openBuilder: (context, _) => ManageNotePage(
+                id: widget.notesForDisplay[index].id,
+                title: widget.notesForDisplay[index].title,
+                description: widget.notesForDisplay[index].description,
+                inputType: "Edit",
               ),
             );
           },
