@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:animations/animations.dart';
-import 'package:note_app/Page/add_notes_page.dart';
-import 'package:note_app/Page/edit_note_page.dart';
+import 'package:note_app/page/add_notes_page.dart';
+import 'package:note_app/page/edit_note_page.dart';
 import 'package:note_app/constant.dart';
 import 'package:note_app/database/database.dart';
 import 'package:note_app/model/note.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:note_app/widget/list_notes.dart';
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -13,10 +14,16 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  //Variable init to store data from database
   List<Note> _notes = [];
+
+  //Variable init to store data from database, for displaying purpose(search function)
   List<Note> _notesForDisplay = [];
+
+  //Main font initialization(delete soon)
   String mainFont = 'Poppins';
 
+  //Init and store data from database to variables
   @override
   void initState() {
     super.initState();
@@ -32,37 +39,45 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backgroundColor,
+
+      //Home Page App Bar
       appBar: AppBar(
         elevation: 0,
-        centerTitle: true,
-        leading: GestureDetector(
-          child: Icon(Icons.menu),
-          onTap: () {},
-        ),
+
+        //Task list icon in app bar
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 20.0),
             child: GestureDetector(
-              child: Icon(Icons.search),
+              child: Icon(Icons.list),
             ),
           )
         ],
-        title: RichText(
-          text: TextSpan(
-            children: [
-              TextSpan(
-                text: 'My',
-                style: title1,
-              ),
-              TextSpan(
-                text: 'Notes',
-                style: title2,
-              ),
-            ],
+
+        //App Bar title
+        title: Padding(
+          padding: EdgeInsets.only(left: 2.0),
+          child: RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: 'My',
+                  style: title1,
+                ),
+                TextSpan(
+                  text: 'Notes',
+                  style: title2,
+                ),
+              ],
+            ),
           ),
         ),
+
+        //App Bar background color
         backgroundColor: backgroundColor,
       ),
+
+      //Animation container to handle add note animation
       floatingActionButton: OpenContainer(
         closedColor: yellow,
         openColor: yellow,
@@ -71,6 +86,8 @@ class _MyHomePageState extends State<MyHomePage> {
             Radius.circular(40),
           ),
         ),
+
+        //Floating action button to add note
         closedBuilder: (context, callback) {
           return FloatingActionButton(
             backgroundColor: yellow,
@@ -83,144 +100,51 @@ class _MyHomePageState extends State<MyHomePage> {
         },
         openBuilder: (context, _) => AddNotesPage(),
       ),
+
+      //App Body, contains search bar and notes
       body: Column(children: [
-        Container(
-          margin: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 0),
-          decoration: BoxDecoration(
-            color: primaryColor,
-            borderRadius: BorderRadius.circular(30.0),
-          ),
-          child: TextField(
-            style: GoogleFonts.poppins(
-              textStyle: TextStyle(
-                color: white,
-              ),
-            ),
-            onChanged: (text) {
-              text = text.toLowerCase();
-              setState(() {
-                _notesForDisplay = _notes.where((element) {
-                  var noteTitle = element.title.toLowerCase();
-                  return noteTitle.contains(text);
-                }).toList();
-              });
-            },
-            decoration: InputDecoration(
-              prefixIcon: Icon(
-                Icons.search,
-                color: Colors.grey,
-              ),
-              hintText: "Search the title here. . .",
-              hintStyle: TextStyle(
-                color: Colors.grey,
-              ),
-              border: InputBorder.none,
-            ),
-          ),
+        searchBar(),
+        ListNotes(
+          notesForDisplay: _notesForDisplay,
         ),
-        list(),
       ]),
     );
   }
 
-  dataNotes() {
-    return ListView(
-      physics: ScrollPhysics(),
-      shrinkWrap: true,
-      children: [
-        GridView.builder(
-          physics: ScrollPhysics(),
-          padding: EdgeInsets.only(
-            bottom: 6,
+  //Search bar widget
+  searchBar() {
+    return Container(
+      margin: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 0),
+      decoration: BoxDecoration(
+        color: primaryColor,
+        borderRadius: BorderRadius.circular(30.0),
+      ),
+      child: TextField(
+        style: GoogleFonts.poppins(
+          textStyle: TextStyle(
+            color: white,
           ),
-          shrinkWrap: true,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
+        ),
+        onChanged: (text) {
+          text = text.toLowerCase();
+          setState(() {
+            _notesForDisplay = _notes.where((element) {
+              var noteTitle = element.title.toLowerCase();
+              return noteTitle.contains(text);
+            }).toList();
+          });
+        },
+        decoration: InputDecoration(
+          prefixIcon: Icon(
+            Icons.search,
+            color: Colors.grey,
           ),
-          itemCount: _notesForDisplay.length,
-          itemBuilder: (context, i) {
-            return OpenContainer(
-              closedShape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(
-                  Radius.circular(12),
-                ),
-              ),
-              closedColor: white,
-              closedBuilder: (context, callback) {
-                return GestureDetector(
-                  onTap: callback,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: white,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: double.infinity,
-                          color: yellow,
-                          padding: EdgeInsets.all(10),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  _notesForDisplay[i].title,
-                                  style: GoogleFonts.getFont(
-                                    mainFont,
-                                    color: primaryColor,
-                                    fontSize: 13,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.all(10),
-                          child: Text(
-                            _notesForDisplay[i].description,
-                            style: GoogleFonts.getFont(
-                              mainFont,
-                              color: backgroundColor,
-                              fontSize: 13,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 5,
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                );
-              },
-              openBuilder: (context, _) => EditNotePage(
-                id: _notesForDisplay[i].id,
-                title: _notesForDisplay[i].title,
-                description: _notesForDisplay[i].description,
-              ),
-            );
-          },
+          hintText: "Search the title here. . .",
+          hintStyle: TextStyle(
+            color: Colors.grey,
+          ),
+          border: InputBorder.none,
         ),
-      ],
-    );
-  }
-
-  list() {
-    return Expanded(
-      child: Container(
-        decoration: BoxDecoration(
-          color: backgroundColor,
-        ),
-        padding: EdgeInsets.only(
-          left: 20.0,
-          right: 20.0,
-          top: 20.0,
-        ),
-        child: dataNotes(),
       ),
     );
   }
