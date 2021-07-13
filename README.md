@@ -1,6 +1,6 @@
 # note_app
 
-A new Flutter project.
+Note_app is a note mobile application built using Flutter
 
 ## Getting Started
 
