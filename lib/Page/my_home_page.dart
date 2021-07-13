@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:animations/animations.dart';
 import 'package:note_app/page/add_notes_page.dart';
-import 'package:note_app/page/edit_note_page.dart';
 import 'package:note_app/constant.dart';
 import 'package:note_app/database/database.dart';
 import 'package:note_app/model/note.dart';
