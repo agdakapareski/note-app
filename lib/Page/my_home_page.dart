@@ -55,7 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
         //App Bar title
         title: Padding(
-          padding: EdgeInsets.only(left: 2.0),
+          padding: EdgeInsets.only(left: 3.0),
           child: AppBarTitle(
             title: 'My',
             subtitle: 'Notes',
